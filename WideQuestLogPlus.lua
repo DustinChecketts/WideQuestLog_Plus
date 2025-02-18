@@ -1,4 +1,4 @@
--- Customize the appearance and behavior of the Quest Log window
+ -- Customize the appearance and behavior of the Quest Log window
 UIPanelWindows["QuestLogFrame"] = {
     area = "override",
     pushable = 0,
@@ -12,6 +12,15 @@ UIPanelWindows["QuestLogFrame"] = {
 
 -- Function to customize the appearance and behavior of the wide Quest Log
 local function WideQuestLogPlus()
+    -- Check if VoiceOver is installed and enabled
+    local function IsVoiceOverEnabled()
+        local addonName = "AI_VoiceOver"
+        local name, _, _, enabled = GetAddOnInfo(addonName)
+        return name and enabled
+    end
+
+    local isVoiceOverLoaded = IsVoiceOverEnabled()
+
     -- Widen the window
     QuestLogFrame:SetWidth(724)
     QuestLogFrame:SetHeight(513)
@@ -54,12 +63,16 @@ local function WideQuestLogPlus()
                 title, level, _, isHeader = GetQuestLogTitle(questIndex)
 
                 if (not isHeader) then
-                    -- Format the quest text with recommended level
-                    questTextFormatted = format("  [%d] %s", level, title)
+                    if isVoiceOverLoaded then -- Adjustment for play button overlap
+                        questTextFormatted = format("       [%d] %s", level, title)         
+                    else -- Default spacing
+                        questTextFormatted = format("[%d] %s", level, title)
+                    end
                     questLogTitle:SetText(questTextFormatted)
-                    questCheck:SetPoint("LEFT", questLogTitle, "LEFT", questLogTitle.Text:GetStringWidth() + 15, 0)
+        		    questCheck:SetPoint("LEFT", questLogTitle, "LEFT", questLogTitle.Text:GetStringWidth() + 18, 0)
                     questCheck:SetVertexColor(64 / 255, 224 / 255, 208 / 255)
                     questCheck:SetDrawLayer("ARTWORK")
+
                 else
                     questCheck:Hide()
                 end
